@@ -1,6 +1,10 @@
 # Compiled class file
 *.class
 
+.settings/
+.vscode/
+target/
+
 # Log file
 *.log
 

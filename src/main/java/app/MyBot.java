@@ -35,6 +35,13 @@ public class MyBot extends PircBot {
                 } catch (IOException err) {
                     System.out.println(err);
                 }
+            } else if (message.contains("weather")) {
+                location = message.replaceAll("\\D+", ""); // remove non-digits
+                try {
+                    temp = getWeather(location);
+                } catch (IOException err) {
+                    System.out.println(err);
+                }
             }
 
             sendMessage(channel, "The weather’s going to be " + temp[0] + " with a high of " + temp[2]
