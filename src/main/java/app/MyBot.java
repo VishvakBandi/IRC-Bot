@@ -24,7 +24,7 @@ public class MyBot extends PircBot {
     public void onMessage(String channel, String sender, String login, String hostname, String message) {
         if (message.contains("weather")) {
             String location = "dallas";
-            double temp = 0;
+            double temp[] = new double[3];
 
             String[] city = message.split(" ");
 
@@ -37,12 +37,14 @@ public class MyBot extends PircBot {
                 }
             }
 
-            sendMessage(channel, sender + " the temperature in " + city[1] + " is now " + temp);
-
+            // sendMessage(channel, sender + " the temperature in " + city[1] + " is now " +
+            // temp);
+            sendMessage(channel, "The weather’s going to be " + temp[0] + " with a high of " + temp[2]
+                    + " and a low of " + temp[1] + ".");
         }
     }
 
-    static double getWeather(String city) throws IOException {
+    static double[] getWeather(String city) throws IOException {
         HttpURLConnection connection;
 
         URL link = new URL(
@@ -73,18 +75,27 @@ public class MyBot extends PircBot {
             String JSONContent = content.toString();
 
             // convert the JSON to an object
+            double temps[] = new double[3];
+            String data = " ";
 
-            String data = convertJSON(JSONContent);
+            data = convertJSON(JSONContent, "temp");
+            temps[0] = Double.parseDouble(data);
 
-            return Double.parseDouble(data);
+            data = convertJSON(JSONContent, "temp_min");
+            temps[1] = Double.parseDouble(data);
+
+            data = convertJSON(JSONContent, "temp_max");
+            temps[2] = Double.parseDouble(data);
+
+            return temps;
         } finally {
             connection.disconnect();
         }
     }
 
-    static String convertJSON(String content) {
+    static String convertJSON(String content, String section) {
         JsonObject object = JsonParser.parseString(content).getAsJsonObject();
-        String data = object.getAsJsonObject("main").get("temp").getAsString();
+        String data = object.getAsJsonObject("main").get(section).getAsString();
 
         return data;
     }
