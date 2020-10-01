@@ -37,8 +37,6 @@ public class MyBot extends PircBot {
                 }
             }
 
-            // sendMessage(channel, sender + " the temperature in " + city[1] + " is now " +
-            // temp);
             sendMessage(channel, "The weather’s going to be " + temp[0] + " with a high of " + temp[2]
                     + " and a low of " + temp[1] + ".");
         }
