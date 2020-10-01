@@ -47,8 +47,9 @@ public class MyBot extends PircBot {
     static double[] getWeather(String city) throws IOException {
         HttpURLConnection connection;
 
-        URL link = new URL(
-                "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=deecdb003a627c10b15a99c60d4bb45f");
+        String APIKey = "deecdb003a627c10b15a99c60d4bb45f";
+
+        URL link = new URL("http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + APIKey);
 
         connection = (HttpURLConnection) link.openConnection();
 
