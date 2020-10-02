@@ -5,6 +5,8 @@
 .vscode/
 target/
 
+src/main/java/app/Keys.java
+
 # Log file
 *.log
 
