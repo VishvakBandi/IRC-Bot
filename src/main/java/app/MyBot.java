@@ -9,10 +9,16 @@ import java.io.*;
 import java.util.*;
 import java.util.jar.JarFile;
 
+import java.io.*;
+import java.net.URL;
+import javax.net.ssl.HttpsURLConnection;
+import java.util.Base64;
+import java.util.List;
+import java.util.ArrayList;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
 import org.jibble.*;
 import org.jibble.pircbot.*;
 
@@ -22,6 +28,10 @@ public class MyBot extends PircBot {
     }
 
     public void onMessage(String channel, String sender, String login, String hostname, String message) {
+        Keys APIkeys = new Keys();
+
+        String weatherKey = APIkeys.getWeatherKey();
+
         if (message.contains("weather")) {
             String location = "dallas";
             double temp[] = new double[3];
@@ -31,14 +41,14 @@ public class MyBot extends PircBot {
             if (city.length == 2) {
                 location = city[1];
                 try {
-                    temp = getWeather(location);
+                    temp = getWeather(location, weatherKey);
                 } catch (IOException err) {
                     System.out.println(err);
                 }
             } else if (message.contains("weather")) {
                 location = message.replaceAll("\\D+", ""); // remove non-digits
                 try {
-                    temp = getWeather(location);
+                    temp = getWeather(location, weatherKey);
                 } catch (IOException err) {
                     System.out.println(err);
                 }
@@ -46,15 +56,25 @@ public class MyBot extends PircBot {
 
             sendMessage(channel, "The weather’s going to be " + temp[0] + " with a high of " + temp[2]
                     + " and a low of " + temp[1] + ".");
-        }
+
     }
 
-    static double[] getWeather(String city) throws IOException {
+    static String[] getTrends(String city, String bearer) throws IOException {
+        int woeid = 0;
+        URL url = new URL("https://api.twitter.com/1.1/trends/place.json?id=" + woeid);
+
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        connection.setRequestMethod("GET");
+
+        connection.setRequestProperty("Authorization", bearer);
+
+    }
+
+    static double[] getWeather(String city, String Key) throws IOException {
         HttpURLConnection connection;
 
-        String APIKey = "deecdb003a627c10b15a99c60d4bb45f";
-
-        URL link = new URL("http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + APIKey);
+        URL link = new URL("http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + Key);
 
         connection = (HttpURLConnection) link.openConnection();
 
