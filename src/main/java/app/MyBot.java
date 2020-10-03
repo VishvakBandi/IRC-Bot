@@ -31,6 +31,21 @@ public class MyBot extends PircBot {
         Keys APIkeys = new Keys();
 
         String weatherKey = APIkeys.getWeatherKey();
+        String bearer = APIkeys.getTwitterBearer();
+
+        if (message.contains("twitter")) {
+            String tags[] = new String[39];
+
+            try {
+                tags = getTrends("2388929", bearer);
+
+            } catch (IOException e) {
+                System.out.println(e);
+            }
+
+            sendMessage(channel, "The top 5 trending tags right now are " + tags[1] + ", " + tags[2] + ", " + tags[3]
+                    + ", " + tags[4] + ", " + tags[5]);
+        }
 
         if (message.contains("weather")) {
             String location = "dallas";
@@ -56,19 +71,45 @@ public class MyBot extends PircBot {
 
             sendMessage(channel, "The weather’s going to be " + temp[0] + " with a high of " + temp[2]
                     + " and a low of " + temp[1] + ".");
-
+        }
     }
 
     static String[] getTrends(String city, String bearer) throws IOException {
-        int woeid = 0;
-        URL url = new URL("https://api.twitter.com/1.1/trends/place.json?id=" + woeid);
+        URL url = new URL("https://api.twitter.com/1.1/trends/place.json?id=" + city);
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
         connection.setRequestMethod("GET");
 
-        connection.setRequestProperty("Authorization", bearer);
+        connection.setRequestProperty("Authorization", "Bearer " + bearer);
 
+        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+        StringBuilder content = new StringBuilder();
+
+        String line;
+
+        while ((line = in.readLine()) != null) {
+            content.append(line);
+            content.append(System.lineSeparator());
+
+        }
+        String JSONContent = content.toString();
+
+        int indexSearch = 0;
+        int indexFound = 0;
+
+        String tags[] = new String[39];
+
+        int count = 0;
+
+        while ((indexFound = JSONContent.indexOf("name", indexSearch)) != -1) {
+            JSONContent = JSONContent.substring(indexFound + 7, JSONContent.length());
+            int index = JSONContent.indexOf('"');
+            tags[count] = JSONContent.substring(0, index);
+            count++;
+        }
+        return tags;
     }
 
     static double[] getWeather(String city, String Key) throws IOException {
@@ -85,12 +126,11 @@ public class MyBot extends PircBot {
             // Hit API
             // Print contents
 
-            StringBuilder content;
+            StringBuilder content = new StringBuilder();
 
             try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
 
                 String line;
-                content = new StringBuilder();
 
                 while ((line = in.readLine()) != null) {
 
