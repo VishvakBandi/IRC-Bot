@@ -4,23 +4,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.*;
-import java.io.*;
-import java.util.*;
-import java.util.jar.JarFile;
-
-import java.io.*;
 import java.net.URL;
-import javax.net.ssl.HttpsURLConnection;
-import java.util.Base64;
-import java.util.List;
-import java.util.ArrayList;
-
-import com.google.gson.JsonArray;
+import java.text.DecimalFormat;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.jibble.*;
-import org.jibble.pircbot.*;
+
+import org.jibble.pircbot.PircBot;
 
 public class MyBot extends PircBot {
     public MyBot() {
@@ -48,7 +37,7 @@ public class MyBot extends PircBot {
         }
 
         if (message.contains("weather")) {
-            String location = "dallas";
+            String location;
             double temp[] = new double[3];
 
             String[] city = message.split(" ");
@@ -68,9 +57,10 @@ public class MyBot extends PircBot {
                     System.out.println(err);
                 }
             }
+            DecimalFormat df = new DecimalFormat("0.00");
 
-            sendMessage(channel, "The weather’s going to be " + temp[0] + " with a high of " + temp[2]
-                    + " and a low of " + temp[1] + ".");
+            sendMessage(channel, "The weather’s going to be " + df.format(temp[0]) + " with a high of "
+                    + df.format(temp[2]) + " and a low of " + df.format(temp[1]) + ".");
         }
     }
 
@@ -145,13 +135,13 @@ public class MyBot extends PircBot {
             String data = " ";
 
             data = convertJSON(JSONContent, "temp");
-            temps[0] = Double.parseDouble(data);
+            temps[0] = convertTemp(Double.parseDouble(data));
 
             data = convertJSON(JSONContent, "temp_min");
-            temps[1] = Double.parseDouble(data);
+            temps[1] = convertTemp(Double.parseDouble(data));
 
             data = convertJSON(JSONContent, "temp_max");
-            temps[2] = Double.parseDouble(data);
+            temps[2] = convertTemp(Double.parseDouble(data));
 
             return temps;
         } finally {
@@ -161,8 +151,10 @@ public class MyBot extends PircBot {
 
     static String convertJSON(String content, String section) {
         JsonObject object = JsonParser.parseString(content).getAsJsonObject();
-        String data = object.getAsJsonObject("main").get(section).getAsString();
+        return object.getAsJsonObject("main").get(section).getAsString();
+    }
 
-        return data;
+    static double convertTemp(Double temp) {
+        return (temp * ((double) 9 / 5)) - 459.67;
     }
 }
