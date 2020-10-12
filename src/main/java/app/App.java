@@ -4,18 +4,17 @@ import org.jibble.pircbot.*;
 
 public class App extends PircBot {
     public static void main(String[] args) throws Exception {
-        // start bot function
-        // this function needs to start the bot
-        // read in user input from bot
-        // pass input to getWeather
-        // send data back to bot
-        // print data
-
+        // start bot
         MyBot bot = new MyBot();
 
+        // connect to freenode
         bot.connect("irc.freenode.net");
 
+        // join the right channel
         bot.joinChannel("#khan-bot");
-    }
 
+        // send initial message
+        bot.sendMessage("#khan-bot",
+                "To use this bot, type 'weather <zipcode>' 'weather <city> or 'twitter' to see the weather, or trending twitter tags.");
+    }
 }
